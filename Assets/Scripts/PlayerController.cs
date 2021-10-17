@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody rb_;
     void Start()
     {
-        rb_ = GetComponent<Rigidbody>();//GetComponent<Rigidbody>() allow us to get the Rigidbody component inside the gameObject where this script is attached.
+        rb_ = GetComponent<Rigidbody>(); //GetComponent<Rigidbody>() allow us to get the Rigidbody component inside the gameObject where this script is attached.
     }
     void FixedUpdate()
     {
