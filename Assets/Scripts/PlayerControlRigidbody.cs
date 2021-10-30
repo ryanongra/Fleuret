@@ -5,11 +5,9 @@ using UnityEngine;
 public class PlayerControlRigidbody : MonoBehaviour
 {
 
-    public float Speed = 5;//how fast to move in game unit
+    public float Speed;//how fast to move in game unit
     public float TurnRate = 180;//how fast to turn in sec
     public float ForceMultiplier = 30;
-    public float parryDuration = 0.5f;
-    public float parryTimer = 0;
 
     Rigidbody rb_;
     Animator animator;
@@ -35,18 +33,22 @@ public class PlayerControlRigidbody : MonoBehaviour
         Quaternion newRotation = rb_.rotation * rotationDelta;
 
         Vector3 forward = newRotation * Vector3.forward;
-        Vector3 moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        Vector3 moveDelta;
 
-        if (moveDelta.x < 0)
+        if (vertical < 0 && DistanceFromOpponent() > 2)
         {
             animator.SetBool("MovingForward", true);
-        } else if (moveDelta.x > 0)
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        } 
+        else if (vertical > 0)
         {
             animator.SetBool("MovingBackward", true);
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
         else
         {
             ResetAnimator();
+            moveDelta = new Vector3();
         }
 
         Vector3 newPos = rb_.position + moveDelta;
@@ -67,23 +69,13 @@ public class PlayerControlRigidbody : MonoBehaviour
                 opponentAnimator.SetTrigger("GetParried");
                 opponent.GetDisabled();
             }
-            //parryTimer = parryDuration;
         }
-/*        if (parryTimer > -1)
-        {
-            parryTimer -= Time.deltaTime;
-        }*/
 
     }
 
     public float DistanceFromOpponent()
     {
         return this.transform.position.x - opponent.transform.position.x;
-    }
-
-    public bool IsParrying()
-    {
-        return parryTimer > 0;
     }
 
     private void OnTriggerEnter(Collider other)
