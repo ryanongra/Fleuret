@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /**
- * Credits to Learn Everything Fast for this script
+ * Credits to Learn Everything Fast for this script (with slight modifications)
  * https://www.youtube.com/watch?v=lYIRm4QEqro
  */
 public class CameraController : MonoBehaviour
@@ -27,6 +27,10 @@ public class CameraController : MonoBehaviour
         yaw += speedH * Input.GetAxis("Mouse X");
         pitch -= speedV * Input.GetAxis("Mouse Y");
 
-        transform.eulerAngles = new Vector3(pitch, yaw, 0.0f);
+        transform.eulerAngles = new Vector3(Mathf.Clamp(pitch, -30, 20),
+            Mathf.Clamp(yaw, -130, -50),
+            0.0f);
+
+        
     }
 }
