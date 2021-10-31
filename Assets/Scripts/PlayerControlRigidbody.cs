@@ -5,17 +5,22 @@ using UnityEngine;
 public class PlayerControlRigidbody : MonoBehaviour
 {
 
-    public float Speed = 5;//how fast to move in game unit
+    public float Speed;//how fast to move in game unit
     public float TurnRate = 180;//how fast to turn in sec
     public float ForceMultiplier = 30;
-    public float parryDuration = 0.5f;
-    public float parryTimer = 0;
 
     Rigidbody rb_;
     Animator animator;
 
     public OpponentController opponent;
     Animator opponentAnimator;
+
+    public ScoreboardController scoreboard;
+
+    bool inWarningZone;
+
+    public float minDistanceFromOpponent;
+
     void Start()
     {
         rb_ = GetComponent<Rigidbody>();//GetComponent<Rigidbody>() allow us to get the Rigidbody component inside the gameObject where this script is attached.
@@ -35,18 +40,22 @@ public class PlayerControlRigidbody : MonoBehaviour
         Quaternion newRotation = rb_.rotation * rotationDelta;
 
         Vector3 forward = newRotation * Vector3.forward;
-        Vector3 moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        Vector3 moveDelta;
 
-        if (moveDelta.x < 0)
+        if (vertical < 0 && !inWarningZone)
         {
             animator.SetBool("MovingForward", true);
-        } else if (moveDelta.x > 0)
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        } 
+        else if (vertical > 0 && DistanceFromOpponent() > minDistanceFromOpponent)
         {
             animator.SetBool("MovingBackward", true);
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
         else
         {
             ResetAnimator();
+            moveDelta = new Vector3();
         }
 
         Vector3 newPos = rb_.position + moveDelta;
@@ -62,17 +71,12 @@ public class PlayerControlRigidbody : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse0))
         {
             animator.SetTrigger("Parry");
-            if (DistanceFromOpponent() < 2.1)
+            if (DistanceFromOpponent() < 2.5)
             {
                 opponentAnimator.SetTrigger("GetParried");
                 opponent.GetDisabled();
             }
-            //parryTimer = parryDuration;
         }
-/*        if (parryTimer > -1)
-        {
-            parryTimer -= Time.deltaTime;
-        }*/
 
     }
 
@@ -81,16 +85,26 @@ public class PlayerControlRigidbody : MonoBehaviour
         return this.transform.position.x - opponent.transform.position.x;
     }
 
-    public bool IsParrying()
-    {
-        return parryTimer > 0;
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.CompareTag("Weapon") && !opponent.IsDisabled())
         {
             print("opponent touche");
+            scoreboard.OpponentHit();
+        }
+        if (other.transform.CompareTag("PlayerWarningZone"))
+        {
+            inWarningZone = true;
+            print("in warning zone");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform.CompareTag("PlayerWarningZone"))
+        {
+            inWarningZone = false;
+            print("left warning zone");
         }
     }
 

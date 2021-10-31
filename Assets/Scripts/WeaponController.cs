@@ -22,7 +22,7 @@ public class WeaponController : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter(Collider collision)
+/*    private void OnTriggerEnter(Collider collision)
     {
         print("collision detected");
         if (collision.transform.CompareTag("Weapon"))
@@ -32,10 +32,10 @@ public class WeaponController : MonoBehaviour
                 opponentAnimator.SetTrigger("GetParried");
                 print("opponent got parried");
             }
-/*            if (opponent.isParrying())
+*//*            if (opponent.isParrying())
             {
                 playerAnimator.SetTrigger("GetParried");
-            }*/
+            }*//*
         }
-    }
+    }*/
 }
