@@ -20,7 +20,11 @@ public class OpponentController : MonoBehaviour
     Rigidbody rb_;
     Animator animator;
 
+    public ScoreboardController scoreboard;
+
     public float targetDistance;
+
+    bool inWarningZone = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,13 +44,13 @@ public class OpponentController : MonoBehaviour
         if (timeSinceLastMove > movementTime)
         {
             timeSinceLastMove = 0;
-            targetDistance = Random.Range(2, 5);
+            targetDistance = Random.Range(1, 5);
         } else
         {
             timeSinceLastMove += Time.deltaTime;
         }
 
-        targetDistance = Random.Range(2, 5);
+        targetDistance = Random.Range(1, 5);
         Move();
 
 
@@ -59,20 +63,17 @@ public class OpponentController : MonoBehaviour
     {
         timeSinceLastMove = 0;
         float randomMovementDecision = Random.Range(0, 10);
-        print(randomMovementDecision);
+
         float horizontal = 0;
         float direction;
         if (targetDistance > player.DistanceFromOpponent())
         {
             direction = 1;
         }
-        else //if (targetDistance < player.DistanceFromOpponent() - 1)
+        else
         {
             direction = -1;
-        } /*else
-        {
-            direction = 0;
-        }*/
+        } 
         float vertical;
         if (randomMovementDecision > 8)
         {
@@ -90,15 +91,22 @@ public class OpponentController : MonoBehaviour
         Quaternion newRotation = rb_.rotation * rotationDelta;
 
         Vector3 forward = newRotation * Vector3.forward;
-        Vector3 moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        Vector3 moveDelta = new Vector3();
 
-        if (moveDelta.x < 0)
+        if (player.DistanceFromOpponent() < 3 && player.DistanceFromOpponent() > 2 && !inWarningZone) 
+        {
+            ResetAnimator();
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        }
+        else if (vertical < 0 && !inWarningZone)
         {
             animator.SetBool("MovingForward", true);
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
-        else if (moveDelta.x > 0)
+        else if (vertical > 0)
         {
             animator.SetBool("MovingBackward", true);
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
         else
         {
@@ -108,6 +116,12 @@ public class OpponentController : MonoBehaviour
         Vector3 newPos = rb_.position + moveDelta;
 
         rb_.position = newPos;
+
+
+        if (player.DistanceFromOpponent() < 2)
+        {
+            animator.SetTrigger("Lunge");
+        }
     }
 
     public bool IsDisabled()
@@ -117,7 +131,6 @@ public class OpponentController : MonoBehaviour
 
     public void GetDisabled()
     {
-        print("disabled");
         disabledRemaining = disabledTime;
     }
 
@@ -125,7 +138,19 @@ public class OpponentController : MonoBehaviour
     {
         if (other.transform.CompareTag("Weapon"))
         {
-            print("player touche");
+            scoreboard.PlayerHit();
+        }
+        if(other.transform.CompareTag("OpponentWarningZone"))
+        {
+            inWarningZone = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform.CompareTag("OpponentWarningZone"))
+        {
+            inWarningZone = false;
         }
     }
 

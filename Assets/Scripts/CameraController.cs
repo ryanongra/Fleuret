@@ -15,6 +15,10 @@ public class CameraController : MonoBehaviour
     public float yaw = 0.0f;
     public float pitch = 0.0f;
 
+    public Transform target;
+    public float smoothSpeed = 0.125f;
+    public Vector3 offset;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +26,7 @@ public class CameraController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         yaw += speedH * Input.GetAxis("Mouse X");
         pitch -= speedV * Input.GetAxis("Mouse Y");
@@ -32,5 +36,12 @@ public class CameraController : MonoBehaviour
             0.0f);
 
         
+    }
+
+    void LateUpdate()
+    {
+        /*Vector3 desiredPosition = target.position + offset;
+        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, desiredPosition, smoothSpeed);*/
+        transform.position = target.position + offset;
     }
 }

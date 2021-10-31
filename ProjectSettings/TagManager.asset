@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Opponent
   - Weapon
+  - PlayerWarningZone
+  - OpponentWarningZone
   layers:
   - Default
   - TransparentFX

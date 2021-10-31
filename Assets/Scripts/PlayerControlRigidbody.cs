@@ -14,6 +14,13 @@ public class PlayerControlRigidbody : MonoBehaviour
 
     public OpponentController opponent;
     Animator opponentAnimator;
+
+    public ScoreboardController scoreboard;
+
+    bool inWarningZone;
+
+    public float minDistanceFromOpponent;
+
     void Start()
     {
         rb_ = GetComponent<Rigidbody>();//GetComponent<Rigidbody>() allow us to get the Rigidbody component inside the gameObject where this script is attached.
@@ -35,12 +42,12 @@ public class PlayerControlRigidbody : MonoBehaviour
         Vector3 forward = newRotation * Vector3.forward;
         Vector3 moveDelta;
 
-        if (vertical < 0 && DistanceFromOpponent() > 2)
+        if (vertical < 0 && !inWarningZone)
         {
             animator.SetBool("MovingForward", true);
             moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         } 
-        else if (vertical > 0)
+        else if (vertical > 0 && DistanceFromOpponent() > minDistanceFromOpponent)
         {
             animator.SetBool("MovingBackward", true);
             moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
@@ -64,7 +71,7 @@ public class PlayerControlRigidbody : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse0))
         {
             animator.SetTrigger("Parry");
-            if (DistanceFromOpponent() < 2.1)
+            if (DistanceFromOpponent() < 2.5)
             {
                 opponentAnimator.SetTrigger("GetParried");
                 opponent.GetDisabled();
@@ -83,6 +90,21 @@ public class PlayerControlRigidbody : MonoBehaviour
         if (other.transform.CompareTag("Weapon") && !opponent.IsDisabled())
         {
             print("opponent touche");
+            scoreboard.OpponentHit();
+        }
+        if (other.transform.CompareTag("PlayerWarningZone"))
+        {
+            inWarningZone = true;
+            print("in warning zone");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform.CompareTag("PlayerWarningZone"))
+        {
+            inWarningZone = false;
+            print("left warning zone");
         }
     }
 
