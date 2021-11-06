@@ -1441,6 +1441,10 @@ MonoBehaviour:
   player: {fileID: 491473252}
   scoreboard: {fileID: 453983421}
   targetDistance: 1
+  minimumTargetDistance: 1
+  targetDistanceStrictness: 0.8
+  distanceToAttack: 2
+  attackDistanceStrictness: 1
 --- !u!1 &932424287
 GameObject:
   m_ObjectHideFlags: 0
@@ -2490,6 +2494,10 @@ MonoBehaviour:
   player: {fileID: 0}
   scoreboard: {fileID: 0}
   targetDistance: 0
+  minimumTargetDistance: 0
+  targetDistanceStrictness: 0
+  distanceToAttack: 0
+  attackDistanceStrictness: 0
 --- !u!1 &1589270185
 GameObject:
   m_ObjectHideFlags: 0

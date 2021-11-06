@@ -17,6 +17,8 @@ public class ScoreboardController : MonoBehaviour
     public float cutOffTime = 2.5f;
     public float timeTillCutOff = 2.6f;
 
+    public SoundManager soundManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +41,7 @@ public class ScoreboardController : MonoBehaviour
 
     public void PlayerHit()
     {
+        soundManager.PlayScoreSound();
         playerLight.color = Color.red;
         timeTillCutOff = 0;
         print("red");
@@ -46,6 +49,7 @@ public class ScoreboardController : MonoBehaviour
 
     public void OpponentHit()
     {
+        soundManager.PlayScoreSound();
         opponentLight.color = Color.green;
         timeTillCutOff = 0;
         print("green");
