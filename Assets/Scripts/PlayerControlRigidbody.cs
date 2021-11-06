@@ -23,6 +23,8 @@ public class PlayerControlRigidbody : MonoBehaviour
 
     public SoundManager soundManager;
 
+    public bool movingForward;
+
     void Start()
     {
         rb_ = GetComponent<Rigidbody>();//GetComponent<Rigidbody>() allow us to get the Rigidbody component inside the gameObject where this script is attached.
@@ -46,16 +48,19 @@ public class PlayerControlRigidbody : MonoBehaviour
 
         if (vertical < 0 && !inWarningZone)
         {
+            movingForward = false;
             animator.SetBool("MovingForward", true);
             moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         } 
         else if (vertical > 0 && DistanceFromOpponent() > minDistanceFromOpponent)
         {
+            movingForward = true;
             animator.SetBool("MovingBackward", true);
             moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
         else
         {
+            movingForward = false;
             ResetAnimator();
             moveDelta = new Vector3();
         }
@@ -78,6 +83,7 @@ public class PlayerControlRigidbody : MonoBehaviour
                 opponentAnimator.SetTrigger("GetParried");
                 opponent.GetDisabled();
                 soundManager.PlayParrySound();
+               
             }
         }
 

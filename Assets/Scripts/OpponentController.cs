@@ -33,6 +33,10 @@ public class OpponentController : MonoBehaviour
 
     bool inWarningZone = false;
 
+    public bool movingForawrd;
+
+    public PriorityManager priorityManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,20 +52,104 @@ public class OpponentController : MonoBehaviour
         {
             disabledRemaining -= Time.deltaTime;
         }
-        if (timeSinceLastMove > movementTime)
+
+        if (priorityManager.priority == PriorityManager.Priority.PLAYER)
         {
-            timeSinceLastMove = 0;
+            if (timeSinceLastMove > movementTime)
+            {
+                timeSinceLastMove = 0;
+                targetDistance = Random.Range(minimumTargetDistance, 5);
+            }
+            else
+            {
+                timeSinceLastMove += Time.deltaTime;
+            }
+
             targetDistance = Random.Range(minimumTargetDistance, 5);
+            DefensiveMove();
         } else
         {
-            timeSinceLastMove += Time.deltaTime;
-        }
+            if (timeSinceLastMove > movementTime)
+            {
+                timeSinceLastMove = 0;
+                targetDistance = Random.Range(minimumTargetDistance, minimumTargetDistance);
+            }
+            else
+            {
+                timeSinceLastMove += Time.deltaTime;
+            }
 
-        targetDistance = Random.Range(minimumTargetDistance, 5);
-        Move();
+            targetDistance = Random.Range(minimumTargetDistance, minimumTargetDistance);
+            OffensiveMove();
+        }
     }
 
-    private void Move()
+    private void OffensiveMove()
+    {
+        timeSinceLastMove = 0;
+        float randomMovementDecision = Random.Range(0, 100) / 100;
+
+
+        float horizontal = 0;
+        float direction;
+        if (targetDistance > player.DistanceFromOpponent())
+        {
+            direction = 1;
+        }
+        else
+        {
+            direction = -1;
+        }
+
+        float vertical;
+        if (randomMovementDecision > targetDistanceStrictness)
+        {
+            vertical = 1 * direction;
+        }
+        else
+        {
+            vertical = -1 * direction;
+        }
+
+        float deltaTime = Time.fixedDeltaTime;
+
+        Quaternion rotationDelta = Quaternion.Euler(0, TurnRate * horizontal * deltaTime, 0);
+
+        Quaternion newRotation = rb_.rotation * rotationDelta;
+
+        Vector3 forward = newRotation * Vector3.forward;
+        Vector3 moveDelta = new Vector3();
+
+        if (player.DistanceFromOpponent() < 3 && player.DistanceFromOpponent() > 2 && !inWarningZone)
+        {
+            ResetAnimator();
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        }
+        else if (vertical < 0 && !inWarningZone)
+        {
+            movingForawrd = false;
+            animator.SetBool("MovingForward", true);
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        }
+        else if (vertical > 0)
+        {
+            movingForawrd = true;
+            animator.SetBool("MovingBackward", true);
+            moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
+        }
+        else
+        {
+            ResetAnimator();
+        }
+
+        Vector3 newPos = rb_.position + moveDelta;
+
+        rb_.position = newPos;
+
+        Attack();
+    }
+
+    private void DefensiveMove()
     {
         timeSinceLastMove = 0;
         float randomMovementDecision = Random.Range(0, 100) / 100;
@@ -103,11 +191,13 @@ public class OpponentController : MonoBehaviour
         }
         else if (vertical < 0 && !inWarningZone)
         {
+            movingForawrd = false;
             animator.SetBool("MovingForward", true);
             moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
         else if (vertical > 0)
         {
+            movingForawrd = true;
             animator.SetBool("MovingBackward", true);
             moveDelta = forward * Speed * vertical * deltaTime * ForceMultiplier;
         }
@@ -120,6 +210,11 @@ public class OpponentController : MonoBehaviour
 
         rb_.position = newPos;
 
+        Attack();
+    }
+
+    private void Attack()
+    {
         float randomAttackDecision = Random.Range(0, 100) / 100;
 
         if (player.DistanceFromOpponent() < distanceToAttack && randomAttackDecision < attackDistanceStrictness)
