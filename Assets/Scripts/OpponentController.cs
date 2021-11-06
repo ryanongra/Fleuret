@@ -22,7 +22,14 @@ public class OpponentController : MonoBehaviour
 
     public ScoreboardController scoreboard;
 
-    public float targetDistance;
+    public float targetDistance;                // the distance from the player that the bot tried to maintain 
+    public float minimumTargetDistance;         // the closest possible distance to the player before the bot decides to go back
+    public float targetDistanceStrictness;      // a float value from 0 to 1 that determines how strictly the bot follows the target distance: 
+                                                // the higher the value, the more strictly it follows
+
+    public float distanceToAttack;              // the maximum distance from the player where the bot might choose to attack
+    public float attackDistanceStrictness;      // a float value from 0 to 1 that determines how strictly the bot follows the distance strictness: 
+                                                // the higher the value, the more strictly it follows
 
     bool inWarningZone = false;
 
@@ -44,25 +51,21 @@ public class OpponentController : MonoBehaviour
         if (timeSinceLastMove > movementTime)
         {
             timeSinceLastMove = 0;
-            targetDistance = Random.Range(1, 5);
+            targetDistance = Random.Range(minimumTargetDistance, 5);
         } else
         {
             timeSinceLastMove += Time.deltaTime;
         }
 
-        targetDistance = Random.Range(1, 5);
+        targetDistance = Random.Range(minimumTargetDistance, 5);
         Move();
-
-
-        
-
-
     }
 
     private void Move()
     {
         timeSinceLastMove = 0;
-        float randomMovementDecision = Random.Range(0, 10);
+        float randomMovementDecision = Random.Range(0, 100) / 100;
+        
 
         float horizontal = 0;
         float direction;
@@ -75,7 +78,7 @@ public class OpponentController : MonoBehaviour
             direction = -1;
         } 
         float vertical;
-        if (randomMovementDecision > 8)
+        if (randomMovementDecision > targetDistanceStrictness)
         {
             vertical = 1 * direction;
         }
@@ -117,8 +120,9 @@ public class OpponentController : MonoBehaviour
 
         rb_.position = newPos;
 
+        float randomAttackDecision = Random.Range(0, 100) / 100;
 
-        if (player.DistanceFromOpponent() < 2)
+        if (player.DistanceFromOpponent() < distanceToAttack && randomAttackDecision < attackDistanceStrictness)
         {
             animator.SetTrigger("Lunge");
         }

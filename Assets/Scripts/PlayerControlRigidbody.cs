@@ -21,6 +21,8 @@ public class PlayerControlRigidbody : MonoBehaviour
 
     public float minDistanceFromOpponent;
 
+    public SoundManager soundManager;
+
     void Start()
     {
         rb_ = GetComponent<Rigidbody>();//GetComponent<Rigidbody>() allow us to get the Rigidbody component inside the gameObject where this script is attached.
@@ -75,6 +77,7 @@ public class PlayerControlRigidbody : MonoBehaviour
             {
                 opponentAnimator.SetTrigger("GetParried");
                 opponent.GetDisabled();
+                soundManager.PlayParrySound();
             }
         }
 
