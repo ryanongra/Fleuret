@@ -3668,7 +3668,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1715989225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3684,6 +3684,8 @@ MonoBehaviour:
   gameController: {fileID: 730590165}
   player: {fileID: 491473252}
   opponent: {fileID: 866530727}
+  playerLight: {fileID: 997252810}
+  opponentLight: {fileID: 33374797}
 --- !u!4 &1715989226
 Transform:
   m_ObjectHideFlags: 0

@@ -64,7 +64,7 @@ public class ScoreboardController : MonoBehaviour
         playerLight.color = Color.red;
         timeTillCutOff = 0;
         playerHit = true;
-        if (!analysing)
+        if (opponentLight.color == Color.green)
         {
             AnalyseHit();
         }
@@ -76,7 +76,7 @@ public class ScoreboardController : MonoBehaviour
         opponentLight.color = Color.green;
         timeTillCutOff = 0;
         oppHit = true;
-        if (!analysing)
+        if (playerLight.color == Color.red)
         {
             AnalyseHit();
         }
@@ -87,18 +87,22 @@ public class ScoreboardController : MonoBehaviour
         analysing = true;
         if (playerHit && !oppHit)
         {
+            Debug.Log("Player score 1");
             playerScore++;
         } else if (!playerHit && oppHit)
         {
+            Debug.Log("Opp score 2");
             opponentScore++;
         } else if (playerHit && oppHit)
         {
             switch (priorityManager.GetPriority())
             {
                 case PriorityManager.Priority.PLAYER:
+                    Debug.Log("Player score");
                     playerScore++;
                     break;
                 case PriorityManager.Priority.OPPONENT:
+                    Debug.Log("Opp score");
                     opponentScore++;
                     break;
                 default:
