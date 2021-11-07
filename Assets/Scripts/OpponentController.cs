@@ -217,7 +217,10 @@ public class OpponentController : MonoBehaviour
     {
         float randomAttackDecision = Random.Range(0, 100) / 100;
 
-        if (player.DistanceFromOpponent() < distanceToAttack && randomAttackDecision < attackDistanceStrictness)
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        bool attacking = stateInfo.IsName("Attack1AForwardFencing_RM");
+
+        if (player.DistanceFromOpponent() < distanceToAttack && randomAttackDecision < attackDistanceStrictness && !attacking)
         {
             animator.SetTrigger("Lunge");
         }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ScoreboardController : MonoBehaviour
 {
@@ -9,15 +10,25 @@ public class ScoreboardController : MonoBehaviour
     public Image opponentLight;
 
     public Text playerScoreDisplay;
-    public Text OpponentScoreDisplay;
+    public Text opponentScoreDisplay;
 
-    public int playerScore;
-    public int opponentScore;
+    public static int playerScore;
+    public static int opponentScore;
 
     public float cutOffTime = 2.5f;
     public float timeTillCutOff = 2.6f;
 
     public SoundManager soundManager;
+
+    bool analysing = false;
+    bool paused = false;
+
+    bool playerHit = false;
+    bool oppHit = false;
+
+    public PriorityManager priorityManager;
+
+    public GameController gameController;
 
     // Start is called before the first frame update
     void Start()
@@ -37,6 +48,14 @@ public class ScoreboardController : MonoBehaviour
         {
             timeTillCutOff += Time.deltaTime;
         }
+        playerScoreDisplay.text = playerScore.ToString();
+        opponentScoreDisplay.text = opponentScore.ToString();
+
+        if (paused)
+        {
+            Time.timeScale = 0;
+        }
+
     }
 
     public void PlayerHit()
@@ -44,7 +63,11 @@ public class ScoreboardController : MonoBehaviour
         soundManager.PlayScoreSound();
         playerLight.color = Color.red;
         timeTillCutOff = 0;
-        print("red");
+        playerHit = true;
+        if (!analysing)
+        {
+            AnalyseHit();
+        }
     }
 
     public void OpponentHit()
@@ -52,6 +75,51 @@ public class ScoreboardController : MonoBehaviour
         soundManager.PlayScoreSound();
         opponentLight.color = Color.green;
         timeTillCutOff = 0;
-        print("green");
+        oppHit = true;
+        if (!analysing)
+        {
+            AnalyseHit();
+        }
+    }
+
+    private void AnalyseHit()
+    {
+        analysing = true;
+        if (playerHit && !oppHit)
+        {
+            playerScore++;
+        } else if (!playerHit && oppHit)
+        {
+            opponentScore++;
+        } else if (playerHit && oppHit)
+        {
+            switch (priorityManager.GetPriority())
+            {
+                case PriorityManager.Priority.PLAYER:
+                    playerScore++;
+                    break;
+                case PriorityManager.Priority.OPPONENT:
+                    opponentScore++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        playerHit = false;
+        oppHit = false;
+        analysing = false;
+        gameController.nextPoint = true;
+    }
+
+    IEnumerator WaitCoroutine()
+    {
+        //Print the time of when the function is first called.
+        Debug.Log("Started Coroutine at timestamp : " + Time.time);
+
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSecondsRealtime(3);
+
+        //After we have waited 5 seconds print the time again.
+        Debug.Log("Finished Coroutine at timestamp : " + Time.time);
     }
 }

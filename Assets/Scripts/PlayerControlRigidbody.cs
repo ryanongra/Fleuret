@@ -98,13 +98,11 @@ public class PlayerControlRigidbody : MonoBehaviour
     {
         if (other.transform.CompareTag("Weapon") && !opponent.IsDisabled())
         {
-            print("opponent touche");
             scoreboard.OpponentHit();
         }
         if (other.transform.CompareTag("PlayerWarningZone"))
         {
             inWarningZone = true;
-            print("in warning zone");
         }
     }
 
@@ -113,7 +111,6 @@ public class PlayerControlRigidbody : MonoBehaviour
         if (other.transform.CompareTag("PlayerWarningZone"))
         {
             inWarningZone = false;
-            print("left warning zone");
         }
     }
 

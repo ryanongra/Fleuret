@@ -5,8 +5,10 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
 
-    bool paused = true;
+    public bool paused = true;
+    public bool nextPoint = false;
     public GameObject pauseMenu;
+    public GameObject nextPointMenu;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,10 +27,15 @@ public class GameController : MonoBehaviour
         {
             Time.timeScale = 0;
             pauseMenu.SetActive(true);
+        } else if (nextPoint)
+        {
+            Time.timeScale = 0;
+            nextPointMenu.SetActive(true);
         } else
         {
             Time.timeScale = 1;
             pauseMenu.SetActive(false);
+            nextPointMenu.SetActive(false);
         }
     }
 }

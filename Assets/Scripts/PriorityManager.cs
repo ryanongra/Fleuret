@@ -42,7 +42,6 @@ public class PriorityManager : MonoBehaviour
             playerParry();
         }
 
-        print(priority);
     }
 
     public void playerParry()
